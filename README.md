@@ -36,12 +36,12 @@ Par exemple, les 100 premières interactions protéine-protéine humaines dispon
 
 Numero de champ | Signification Biologique|
  --- | --- 
-1 | 
-2 |
-3 |
-4 |
-5 |
-6 |
+1 | Identifiant (unique) primaire interacteur A (nom base de données: ID)
+2 | Identifiant (unique) primaire interacteur B (nom base de données: ID
+3 | Identifiant (unique) alternatif A
+4 | Identifiant (unique) alternatif B
+5 | Alias A
+6 | Alias B
 
 ##### Utiliser le PMID de la publication pour récuperer les lignes MITAB des interactions rapportées dans l'étude.
 Une librairie pratique pour manipuler des requêtes HTTP est [requests](https://requests.readthedocs.io/en/master/), eg:
@@ -60,7 +60,7 @@ ans = httpReq.text
 ##### Quelles techniques experimentales mesurent les interactions rapportées dans cette publication?
 
 ```
-
+On le voit dans le champ 7 "Interaction detection methods", dans la publication la méthode utiliséé est le double hybride (Y2H)
 ```
 
 ##### Proposer deux expressions régulières et les champs auxquels les appliquer pour
@@ -68,31 +68,42 @@ ans = httpReq.text
 * Ne retenir que les lignes MITAB dans lesquelles chaque interactant possède un identifiant UNIPROT
 
 ```
-
+On l'applique pour les 2 premiers champs (identifiants des protéines)
+```
+```python
+data_uniprot=filter(lambda x:x[0].startwith("uniprotkb:") and x[1].startwidth("uniprotkb:"),data)
 ```
 
 * Extraire les lignes MITAB impliquant uniquement des protéines d'EBV
 
-```
-
+```python
+data_ebv_ebv=[]
+for l in data_uniprot:
+    if "ebv" in l[9] and "ebv" in l[10]:
+        data_ebv_ebv.append(l)
 ```
 
 * Extraire les lignes MITAB impliquant des protéines humaines et des protéines d'EBV 
 
-```
-
+```python
+data_human_ebv=[]
+for l in data_uniprot:
+    if "ebv" in l[9] and "human" in l[10]:
+        data_human_ebv.append(l)
+    elif "human" in l[9] and "ebv" in l[10]:
+        data_human_ebv.append(l)
 ```
 
 ##### Combien de protéines EBV sont impliquées et pour combien d'interactions EBV/EBV?
 
 ```
-
+59
 ```
 
 ##### Combien de protéines humaines sont impliquées et pour combien d'interactions EBV/Human?
 
 ```
-
+171
 ```
 
 ###### Pour la suite du travail assurez-vous d'avoir les deux jeux de données MITAB suivants
